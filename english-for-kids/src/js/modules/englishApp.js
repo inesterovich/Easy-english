@@ -1,18 +1,38 @@
 import {dictionary}  from '../lang/langs'
 import Card from './card'
 import create from '../utils/create';
+import * as randFunc from '../utils/unicRandomGenerator';
 
+console.log(randFunc);
  export class EnglishApp {
 
     constructor(base) {
-
         this.base = base;
         this.dictionary = dictionary;
         
     }
 
     clickHandler = (event) => {
-    event.preventDefault();
+    if (event.target.closest('.switch__wrapper')) {
+        event.stopPropagation();
+      const switchInput = event.target.closest('.switch__wrapper').childNodes[1].childNodes[0];
+      const trainLabel = event.target.closest('.switch__wrapper').childNodes[0];
+      const playLabel = event.target.closest('.switch__wrapper').childNodes[2];
+      if (switchInput.checked) {
+          switchInput.checked = false;
+          trainLabel.classList.toggle('active');
+          playLabel.classList.toggle('active');
+        
+      } else {
+          switchInput.checked = true;
+          trainLabel.classList.toggle('active');
+          playLabel.classList.toggle('active');
+      }
+
+
+    } else {
+        event.preventDefault()
+    };
          if (event.target.dataset.btn === 'menu') {
              event.target.classList.toggle('active');
              this.layout.modals.classList.toggle('active')
@@ -27,22 +47,29 @@ import create from '../utils/create';
             this.generateLayout(categoryName);
          }
 
+         if (event.target.closest('.menu__item__link')){
+             const linkName = event.target.closest('.menu__item__link').innerText;
+             /* Мне надо удалить все ссылки из меню и добавить активный класс */
+             const linkList = event.target.closest('.menu__list').childNodes;
+             debugger;
+             linkList.forEach(node => {
+                 node.childNodes[0].classList.remove('active');
+             })
+
+             event.target.closest('.menu__item__link').classList.add('active');
+             this.generateLayout(linkName);
+         }
+
 
          if (event.target.closest('.card')) {
             if (event.target.classList.contains('rotate__card')){
-                let frontSide = event.target.closest('.front__side');
-                
- 
+                let frontSide = event.target.closest('.front__side'); 
                 let backSide = event.target.closest('.card').childNodes[1];
                 frontSide.classList.toggle('active');
                 backSide.classList.toggle('active');     
             } else {
                 const cardId = event.target.closest('.card').id;
                 const currentCard = this.categoryCards.find(card => card.id == cardId);
-                /* Звучит звук с обратной стороны. Надо подумать, как его убрать.
-                Как-то надо проверить, что клик был на основной стороне карточки. 
-                
-                */
 
                const frontSide = event.target.closest('.front__side');
     
@@ -79,10 +106,13 @@ import create from '../utils/create';
     }
 
     generateLayout(page) {
-
-        if (page === 'main') {
-        
-         
+    
+        if (page === 'main' || page === 'Main') {
+      
+            let mainContent = this.layout.main.childNodes;
+            while(mainContent.length > 0) {
+                mainContent.forEach(item => item.remove());
+            }
 
             this.categoriesHtml = [];
            this.categories.forEach((categoryName, index) => {
@@ -106,8 +136,19 @@ import create from '../utils/create';
                 mainContent.forEach(item => item.remove());
             }
 
-            this.categoryCards = this.dictionary.filter(wordObj => wordObj.category === page)
-            .map(item => new Card(item, this.base).init());
+            /* Мне в любом случае надо что-то отфильтровать.
+            1. А если фильтровать через константу?
+            
+            */
+           const categoryArray = this.dictionary.filter(wordObj => wordObj.category === page)
+           .map(item => new Card(item, this.base).init())
+
+            const randArray = Array.from(randFunc.generateSet(0, categoryArray.length))
+            .map(item => categoryArray[item]);
+            
+            this.categoryCards = randArray;
+            
+        
           
 
             this.categoryCards.forEach(card => 
@@ -115,29 +156,7 @@ import create from '../utils/create';
                     this.layout.main.appendChild(card.html);
                     const backSide = card.html.childNodes[1];
                     backSide.addEventListener('mouseleave', this.mouseLeaveHandler);
-                });
-
-         
-
-            /* 
-            Осталось
-            1. Оформить карточку;
-            2. Научить переворачиваться;
-            3. Добавить озвучку при клике;
-            4. Научить разворачиваться обратно;
-
-            id возможно надо - для статистики;
-            
-            */
-
-        
-
-
-         
-
-         
-            
-        
+                })
         
         }
 
@@ -162,10 +181,19 @@ import create from '../utils/create';
         this.menuBtn = create('div', 'menu__button', 
         [create('span', '', ''), create('span', '', ''), create('span', '', '') ], null, ['btn', 'menu'])
 
-        let modeButton = create('button', 'mode-button placeholder', 'Train |Play', null);
+        let modeButton = create('div', 'switch__wrapper', [
+            create('label', 'switcher__label switcher__train active', 'Train', null, ['for', 'checkbox']),
+            create('div', 'switcher', 
+                [
+                    create('input', 'switcher__checkbox', null, null,['type', 'checkbox'], ['id', 'checkbox']),
+                    create('span', 'switch__button', )
+                ]),
+            create('label', 'switcher__label switcher__play', 'Play', null, ['for', 'checkbox']),
+        ], null);
 
 
-        this.layout.header = create('header', 'header', [this.menuBtn, create('h1', 'title', 'Easy English'), modeButton], null);
+        this.layout.header = create('header', 'header',
+         [this.menuBtn, create('h1', 'title', 'Easy English'), modeButton], null);
         this.layout.main = create('main', 'main', null,null);
         this.layout.footer = create('footer', 'footer', null, null);
 
@@ -190,6 +218,9 @@ import create from '../utils/create';
              const linkItem = create('li', 'menu__item', create('a', 'menu__item__link', linkName, null, ['href', './']), null);
              menuLinksHtml.push(linkItem);
          })
+
+        menuLinksHtml[0].childNodes[0].classList.add('active')
+        
 
        
 

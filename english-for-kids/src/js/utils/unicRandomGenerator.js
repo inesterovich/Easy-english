@@ -7,7 +7,7 @@ export function generateSet(min, max) {
     const set = new Set();
 
     while (set.size < max) {
-        const randomNumber = generaterandomInteger(min, max);
+        const randomNumber = generaterandomInteger(min, max - 1);
         set.add(randomNumber);
     }
 
