@@ -259,13 +259,13 @@ export class EnglishApp {
                     this.playGame.currentCard.html.classList.add('disabled')
                     const i = this.playGame.randNumbers[this.playGame.index];
                     this.playGame.currentCard = this.categoryCards[i];
-// Promise.race пойдёт мне ?
+                    // Promise.race пойдёт мне ?
                     audio.play();
                     audio.addEventListener('ended',
                         () => this.playSound(this.playGame.currentCard));
                     const coinSrc = './icons/dollartrue.svg'
                     const fullCoin = create('img', 'coin', null, this.playGame.coins, ['src', `${coinSrc}`])
-                    
+
 
                 } else {
 
@@ -324,14 +324,14 @@ export class EnglishApp {
                     }
                 }
 
-              
+
             } else if (cardId !== correctCardId) {
                 this.playGame.counter -= 1;
                 const audioUrl = `./audio/wrongcard.mp3`;
                 const audio = new Audio(audioUrl);
                 audio.play();
                 const coinSrc = './icons/dollarfalse.svg'
-                    const blankCoin = create('img', 'coin', null, this.playGame.coins, ['src', `${coinSrc}`])
+                const blankCoin = create('img', 'coin', null, this.playGame.coins, ['src', `${coinSrc}`])
             }
 
         }
@@ -368,7 +368,13 @@ export class EnglishApp {
         this.layout.header = create('header', 'header',
             [this.menuBtn, create('h1', 'title', 'Easy English'), modeButton], null);
         this.layout.main = create('main', 'main', null, null);
-        this.layout.footer = create('footer', 'footer', null, null);
+        const footerContent = [
+            create('div', 'copyright__wrapper', [create('p', 'copyright', '&copy 2020, Ilya Nesterovich'),
+            create('a', 'github__link', 'Visit GitHub', null,
+                ['href', 'https://github.com/inesterovich/']),]),
+            create('div', 'rsschool__link__wrapper',
+                create('a', 'rsschool__link', create('img', 'rsschool__logo', null, null, ['src', './icons/rs_school_js.svg']), null, ['href', 'https://rs.school/js/']))]
+        this.layout.footer = create('footer', 'footer', footerContent, null);
 
         this.categories = new Set();
         this.categoriesSrc = [];
@@ -422,9 +428,9 @@ export class EnglishApp {
         document.addEventListener('click', this.clickHandler);
 
         return this;
-     
+
     }
 
 
-  
+
 }
