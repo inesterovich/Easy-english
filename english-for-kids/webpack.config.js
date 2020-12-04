@@ -74,6 +74,11 @@ const getPlugins = () => {
                         to: path.resolve(__dirname, 'dist', 'audio'),
 
                     },
+                    {
+                        from: path.resolve(__dirname, 'src', 'icons'),
+                        to: path.resolve(__dirname, 'dist', 'icons'),
+
+                    },
                 ],
 
             },
