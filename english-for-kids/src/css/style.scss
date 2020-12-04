@@ -20,10 +20,41 @@ html {
 }
 
 body {
+    position: relative;
     overflow-x: hidden;
       background-color: $bgColor;
       height: 100%;
       user-select: none;
+
+      .window {
+          position: absolute;
+          top: 0;
+        left: 0;
+          pointer-events: none;
+          width: 100vw;
+          height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 2;
+          background-color: rgba(0,0,0,0.5);
+
+         .result {
+             background-color: #ffffff;
+             padding: 2rem;
+             height: 40vh ;
+             display: flex;
+             align-items: center;
+            column-gap: 5vw;
+             .result__img {
+                 height: 100%;
+             }
+
+             .result__text {
+                 font-size: 5rem;
+             }
+         }
+      }
 }
 
 .page__wrapper {
@@ -197,6 +228,24 @@ body {
             }
             .category__name {
                 padding-bottom: 8rem;
+            }
+        }
+
+
+        .coin__section {
+            width: 100%;
+            padding: 0.5rem;
+            grid-column: 1 / -1;
+            min-height: 3rem;
+            background-color: green;
+            display: flex;
+            flex-direction: row-reverse;
+            column-gap: 0.5rem;
+            flex-wrap: wrap;
+
+            .coin {
+                height: 3rem;
+
             }
         }
 

@@ -218,11 +218,13 @@ export class EnglishApp {
         this.categoryCards = randArray;
 
 
-        /* То есть получается, в игровом режиме меняется только вот этот цикл? */
         this.categoryCards.forEach(card => {
             card.html.classList.add('play')
             this.layout.main.appendChild(card.html);
         })
+
+        this.playGame.coins = create('div', 'coin__section');
+        this.layout.main.prepend(this.playGame.coins);
 
         this.playGame.button = create('button', 'game__button', 'Start Game', this.layout.main);
 
@@ -230,6 +232,7 @@ export class EnglishApp {
     }
 
     playGameHandler = (event) => {
+        debugger;
         if (event.target === this.playGame.button) {
             if (this.playGame.status === null) {
                 this.playGame.status = 'game';
@@ -244,8 +247,7 @@ export class EnglishApp {
 
         }
 
-
-        if (event.target.closest('.card')) {
+        if (event.target.closest('.card') && this.playGame.status) {
             const cardId = Number(event.target.closest('.card').id);
             const correctCardId = Number(this.playGame.currentCard.id);
 
@@ -257,15 +259,69 @@ export class EnglishApp {
                     this.playGame.currentCard.html.classList.add('disabled')
                     const i = this.playGame.randNumbers[this.playGame.index];
                     this.playGame.currentCard = this.categoryCards[i];
+// Promise.race пойдёт мне ?
                     audio.play();
-                    audio.addEventListener('ended', () => this.playSound(this.playGame.currentCard))
+                    audio.addEventListener('ended',
+                        () => this.playSound(this.playGame.currentCard));
+                    const coinSrc = './icons/dollartrue.svg'
+                    const fullCoin = create('img', 'coin', null, this.playGame.coins, ['src', `${coinSrc}`])
                     
 
                 } else {
 
                     this.playGame.currentCard.html.classList.add('disabled')
                     const result = this.categoryCards.length === this.playGame.counter ? 'Success' : 'Failure';
-                    alert(result);
+                    this.playGame.button.remove();
+                    if (result === 'Success') {
+                        const src = './icons/succesgame.png'
+                        const window = create('div', 'window', create('div', 'result',
+                            [
+                                create('img', 'result__img', null, null, ['src', `${src}`]),
+                                create('p', 'result__text', 'You won the game!')
+                            ]
+                        ));
+                        this.layout.body.appendChild(window);
+                        const audioSrc = './audio/sucessgame.mp3';
+                        const audio = new Audio(audioSrc);
+                        audio.play();
+
+                        audio.addEventListener('ended', () => {
+                            window.remove();
+                            this.playGame.index = 0;
+                            this.playGame.status = null;
+                            this.playGame.counter = null;
+                            this.generateLayout('main');
+                        })
+
+
+
+
+                    } else if (result === 'Failure') {
+                        const mistakes = this.categoryCards.length - this.playGame.counter;
+                        const src = './icons/failedgame.png';
+                        const ending = mistakes > 1 ? 'es' : 'e'
+                        const window = create('div', 'window', create('div', 'result',
+                            [
+                                create('img', 'result__img', null, null, ['src', `${src}`]),
+                                create('p', 'result__text', `Sorry, you lost.
+                                 You made ${mistakes} mistak${ending}.`)
+                            ]
+                        ));
+                        this.layout.body.appendChild(window);
+
+                        const audioSrc = './audio/failedgame.mp3';
+                        const audio = new Audio(audioSrc);
+                        audio.play();
+
+                        audio.addEventListener('ended', () => {
+                            window.remove();
+                            this.playGame.index = 0;
+                            this.playGame.status = null;
+                            this.playGame.counter = null;
+                            this.generateLayout('main');
+                        })
+
+                    }
                 }
 
               
@@ -274,6 +330,8 @@ export class EnglishApp {
                 const audioUrl = `./audio/wrongcard.mp3`;
                 const audio = new Audio(audioUrl);
                 audio.play();
+                const coinSrc = './icons/dollarfalse.svg'
+                    const blankCoin = create('img', 'coin', null, this.playGame.coins, ['src', `${coinSrc}`])
             }
 
         }
@@ -292,7 +350,7 @@ export class EnglishApp {
             modals: null,
         };
 
-        let body = document.querySelector('body');
+        this.layout.body = document.querySelector('body');
         this.menuBtn = create('div', 'menu__button',
             [create('span', '', ''), create('span', '', ''), create('span', '', '')], null, ['btn', 'menu'])
 
@@ -350,7 +408,7 @@ export class EnglishApp {
 
 
 
-        body.prepend(pageWrapper)
+        this.layout.body.prepend(pageWrapper)
 
         return this;
     }
@@ -364,13 +422,9 @@ export class EnglishApp {
         document.addEventListener('click', this.clickHandler);
 
         return this;
-        // Всё, что требуется сделать один раз при создании
+     
     }
 
 
-    /* 
-    Я иду в стиле SPA: всё приложение - одна страница. Есть роутинг. 
-    То есть, у меня всё загнано в класс и внутри всё происходит
-    
-    */
+  
 }
