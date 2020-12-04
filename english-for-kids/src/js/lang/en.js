@@ -479,12 +479,167 @@ export default [
             return `./audio/${this.en}.mp3`
         }
     },
+    //
+    {   id: 48,
+        en: 'candy',
+        category: 'sweets',
+      get src() {
+            return `./images/${this.en}.jpg`
+        },
+        get audioUrl() {
+            return `./audio/${this.en}.mp3`
+        }
+    },
+    {   id: 49,
+        en: 'cake',
+        category: 'sweets',
+      get src() {
+            return `./images/${this.en}.jpg`
+        },
+        get audioUrl() {
+            return `./audio/${this.en}.mp3`
+        }
+    },
+    {   id: 50,
+        en: 'biscuit',
+        category: 'sweets',
+      get src() {
+            return `./images/${this.en}.jpg`
+        },
+        get audioUrl() {
+            return `./audio/${this.en}.mp3`
+        }
+    },
+    {   id: 51,
+        en: 'chocolate',
+        category: 'sweets',
+      get src() {
+            return `./images/${this.en}.jpg`
+        },
+        get audioUrl() {
+            return `./audio/${this.en}.mp3`
+        }
+    },
+    {   id: 52,
+        en: 'doughnut',
+        category: 'sweets',
+      get src() {
+            return `./images/${this.en}.jpg`
+        },
+        get audioUrl() {
+            return `./audio/${this.en}.mp3`
+        }
+    },
+    {   id: 53,
+        en: 'honey',
+        category: 'sweets',
+      get src() {
+            return `./images/${this.en}.jpg`
+        },
+        get audioUrl() {
+            return `./audio/${this.en}.mp3`
+        }
+    },
+    {   id: 54,
+        en: 'marmalade',
+        category: 'sweets',
+      get src() {
+            return `./images/${this.en}.jpg`
+        },
+        get audioUrl() {
+            return `./audio/${this.en}.mp3`
+        }
+    },
+    {   id: 55,
+        en: 'pancake',
+        category: 'sweets',
+      get src() {
+            return `./images/${this.en}.jpg`
+        },
+        get audioUrl() {
+            return `./audio/${this.en}.mp3`
+        }
+    },
+    //
+    {   id: 56,
+        en: 'beverage',
+        category: 'drinks',
+      get src() {
+            return `./images/${this.en}.jpg`
+        },
+        get audioUrl() {
+            return `./audio/${this.en}.mp3`
+        }
+    },
+    {   id: 57,
+        en: 'tea',
+        category: 'drinks',
+      get src() {
+            return `./images/${this.en}.jpg`
+        },
+        get audioUrl() {
+            return `./audio/${this.en}.mp3`
+        }
+    },
+    {   id: 58,
+        en: 'coffee',
+        category: 'drinks',
+      get src() {
+            return `./images/${this.en}.jpg`
+        },
+        get audioUrl() {
+            return `./audio/${this.en}.mp3`
+        }
+    },
+    {   id: 59,
+        en: 'water',
+        category: 'drinks',
+      get src() {
+            return `./images/${this.en}.jpg`
+        },
+        get audioUrl() {
+            return `./audio/${this.en}.mp3`
+        }
+    },
+    {   id: 60,
+        en: 'cocoa',
+        category: 'drinks',
+      get src() {
+            return `./images/${this.en}.jpg`
+        },
+        get audioUrl() {
+            return `./audio/${this.en}.mp3`
+        }
+    },
+    {   id: 61,
+        en: 'juice',
+        category: 'drinks',
+      get src() {
+            return `./images/${this.en}.jpg`
+        },
+        get audioUrl() {
+            return `./audio/${this.en}.mp3`
+        }
+    },
+    {   id: 62,
+        en: 'lemonade',
+        category: 'drinks',
+      get src() {
+            return `./images/${this.en}.jpg`
+        },
+        get audioUrl() {
+            return `./audio/${this.en}.mp3`
+        }
+    },
+    {   id: 63,
+        en: 'milk',
+        category: 'drinks',
+      get src() {
+            return `./images/${this.en}.jpg`
+        },
+        get audioUrl() {
+            return `./audio/${this.en}.mp3`
+        }
+    },
     
 ]
-
-/*
- id надо прописывать ручками всё-таки. Иначе никак не найти - при сортировке всё перемешается.
-Есть поле id -объединять буду по нему. То есть, берем английский массив и внутрь туда прокидываем ещё одно поле
-
-
-*/
