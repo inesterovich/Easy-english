@@ -2,9 +2,9 @@ import { dictionary } from '../lang/langs'
 import Card from './card'
 import create from '../utils/create';
 import * as randFunc from '../utils/unicRandomGenerator';
+import * as storage from '../utils/storage'
 
 export class EnglishApp {
-
     constructor(base) {
         this.base = base;
         this.dictionary = dictionary;
@@ -16,6 +16,9 @@ export class EnglishApp {
             index: 0,
             counter: 0,
         }
+
+        this.stats = storage.get('stats') || [];
+
     }
 
     clickHandler = (event) => {
@@ -54,12 +57,15 @@ export class EnglishApp {
         } else {
             event.preventDefault()
         };
+
         if (event.target.dataset.btn === 'menu') {
             event.target.classList.toggle('active');
-            this.layout.modals.classList.toggle('active')
+            this.layout.modals.classList.toggle('active');
+            this.layout.body.classList.toggle('unscrollable');
         } else {
             this.layout.modals.classList.remove('active');
             this.menuBtn.classList.remove('active');
+            this.layout.body.classList.remove('unscrollable');
         }
 
         if (event.target.closest('.category__card')) {
@@ -81,6 +87,10 @@ export class EnglishApp {
 
         if (this.mode === 'Train') {
             if (event.target.closest('.card')) {
+                const id = event.target.closest('.card').id;
+                const statObj = this.stats[id];
+                statObj.train += 1;
+                storage.set('stats', this.stats);
                 if (event.target.classList.contains('rotate__card')) {
                     let frontSide = event.target.closest('.front__side');
                     let backSide = event.target.closest('.card').childNodes[1];
@@ -110,6 +120,14 @@ export class EnglishApp {
         }
 
 
+        if (event.target.dataset.tableHeader) {
+            const field = event.target.dataset.field;
+            let sortOrder = event.target.dataset.sortOrder;
+            
+            this.generateStatsLayout(event.target, field, sortOrder)
+         
+            
+        }
 
 
 
@@ -147,21 +165,148 @@ export class EnglishApp {
                 this.categoriesHtml.push(categoryCard)
             })
 
+            this.layout.main.classList.remove('stats');
+
 
         }
 
-        if (this.categories.includes(page)) {
-
-            this.mode === 'Train' ? this.setTrainLayout(page) : this.setPlayLayout(page)
+        if (page === 'stats' || page === 'Stats') {
+            this.generateStatsLayout(null, 'name', true);
+            delete this.layout.main.dataset.categoryName;
+            
+            
         }
 
+
         if (this.categories.includes(page)) {
+            this.mode === 'Train' ? this.setTrainLayout(page) : this.setPlayLayout(page);
             this.layout.main.dataset.isCategory = 'true';
             this.layout.main.dataset.categoryName = page;
+            this.layout.main.classList.remove('stats');
         } else {
             this.layout.main.dataset.isCategory = 'false';
         }
 
+    }
+
+
+    generateStatsLayout(target, field, sortOrder) {
+       
+        let mainContent = this.layout.main.childNodes;
+        while (mainContent.length > 0) {
+            mainContent.forEach(item => item.remove());
+        }
+
+        const buttons = create('div', 'statsButtons', [
+            create('button', 'hard__words_button', `Repeat dificcult words`, null, ['type', 'button']),
+            create('button', 'resetButton', 'Reset', null, ['type', 'button'])
+        ])
+        const header = create('tr', 'table__header',
+            [
+        create('th', 'name', 'name', null,['tableHeader', 'true'], ['field', 'name']),
+        create('th', 'translate', 'translate', null, ['tableHeader', 'true'], ['field', 'translate'],),
+        create('th', 'category', 'category', null, ['tableHeader', 'true'], ['field', 'category']),
+        create('th', 'train', 'train', null, ['tableHeader', 'true'], ['field', 'train'], ),
+        create('th', 'play', 'play', null, ['tableHeader', 'true'], ['field', 'play'], ),
+        create('th', 'correct', 'correct', null, ['tableHeader', 'true'], ['field', 'correctPercent'], ),
+        create('th', 'errors', 'errors', null, ['tableHeader', 'true'], ['field', 'errors'], ),
+            ])
+        
+        const thead = create('thead', 'thead', header);
+        const tbody = create('tbody', 'tbody', null);
+        
+        const statsArray = [];
+            
+        this.dictionary.forEach(word => {
+
+            const statsObj = {
+             name: word.en,
+             translate: word.ru,
+             category: word.category,
+             train: this.stats[word.id].train,
+             play: this.stats[word.id].play,
+             errors: this.stats[word.id].errors,
+             correctPercent: this.stats[word.id].correctPercent,
+            }
+
+            statsArray.push(statsObj)
+
+        })
+       
+
+        if (target) {
+
+            const childs = header.childNodes;
+            let targetIndex = 0;
+
+            while (target.dataset.field != childs[targetIndex].dataset.field) {
+                targetIndex += 1;
+            }
+
+            if (!target.dataset.sortOrder) {
+            
+                for (let i = 0; i < childs.length; i += 1) {
+                    if (i === targetIndex) {
+                        childs[i].dataset.sortOrder = true;
+                    } else {
+                        delete childs[i].dataset.sortOrder;
+                    }
+                }
+               
+                sortOrder = true;
+                const tableHeadHTML = target.closest('thead');
+                console.log(tableHeadHTML);  
+            } else if (target.dataset.sortOrder === 'true') {
+                childs[targetIndex].dataset.sortOrder === 'false';
+                sortOrder = false;
+            } else if (targetIndex.dataset.sortOrder === 'false') {
+                childs[targetIndex].dataset.sortOrder === 'true';
+                sortOrder = true;
+            }
+
+        } else {
+            header.childNodes[0].dataset.sortOrder = true;
+        }
+      
+        statsArray.sort(this.sortByfieldNane(field, sortOrder))
+
+        statsArray.forEach(statsObj => {
+            const html = create('tr', 'stats__row',
+            [
+                create('td', 'td__name', `${statsObj.name}`),
+                create('td', 'td__translate', `${statsObj.translate}`),
+                create('td', 'td__category', `${statsObj.category}`),
+                create('td', 'td__train', `${statsObj.train}`),
+                create('td', 'td__play', `${statsObj.play}`),
+                create('td', 'td__corrects', `${statsObj.correctPercent}`),
+                create('td', 'td__corrects', `${statsObj.errors}`),
+            
+            ])
+        
+        tbody.appendChild(html);
+            
+            
+          
+        })
+
+
+    const table = create('table', 'stats',
+        [thead,
+        tbody,
+        ], null)
+    
+        this.layout.main.appendChild(buttons);
+        this.layout.main.appendChild(table);
+        this.layout.main.classList.add('stats');
+    }
+
+    sortByfieldNane(field, sortOrder) {
+        if (sortOrder === true) {
+            return (a, b) => a[field] > b[field] ? 1 : -1;
+        } else {
+            return (a, b) => a[field] < b[field] ? 1 : -1;
+        }
+        
     }
 
     playSound(currentCard) {
@@ -232,7 +377,6 @@ export class EnglishApp {
     }
 
     playGameHandler = (event) => {
-        debugger;
         if (event.target === this.playGame.button) {
             if (this.playGame.status === null) {
                 this.playGame.status = 'game';
@@ -253,6 +397,8 @@ export class EnglishApp {
 
             if (cardId === correctCardId) {
                 if (this.playGame.index + 1 < this.categoryCards.length) {
+                    this.stats[cardId].play += 1;
+                    storage.set(this.stats);
                     this.playGame.index += 1;
                     const audioUrl = `./audio/correctcard.mp3`;
                     const audio = new Audio(audioUrl);
@@ -327,6 +473,9 @@ export class EnglishApp {
 
             } else if (cardId !== correctCardId) {
                 this.playGame.counter -= 1;
+                this.stats[correctCardId].play += 1;
+                this.stats[correctCardId].errors += 1;
+                storage.set('stats', this.stats);
                 const audioUrl = `./audio/wrongcard.mp3`;
                 const audio = new Audio(audioUrl);
                 audio.play();
@@ -337,7 +486,6 @@ export class EnglishApp {
         }
 
     }
-
 
     generateSkin() {
 
@@ -387,6 +535,27 @@ export class EnglishApp {
 
 
         })
+        
+        if (this.stats.length === 0) {
+            for (let i = 0; i < this.dictionary.length; i += 1) {
+        
+                const name = this.dictionary[i].en;
+                this.stats[i] = {
+                    name: name,
+                    train: 0,
+                    play: 0,
+                    errors : 0,
+    
+                    get correctPercent() {
+                        let result = ((this.play - this.errors) / this.play) * 100;
+                        if (isNaN(result)) result = 0;
+                        return result.toFixed(2);
+                    }
+                }
+            }
+        } else if (this.stats.length != 0) {
+            this.stats = storage.get('stats');
+        }
 
 
         this.categories = Array.from(this.categories);
@@ -419,8 +588,7 @@ export class EnglishApp {
         return this;
     }
 
-
-
+   
 
     init() {
         this.generateSkin();

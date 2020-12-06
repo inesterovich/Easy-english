@@ -5,6 +5,7 @@ $bgMenuColor: #ffffff;
 $btnColor: #9fa3ac;
 $headerHeight: 8rem;
 $switchButtonSize: 3.6rem;
+$pageWrapperWidth: 1024px;
 
 
 * {
@@ -55,6 +56,11 @@ body {
              }
          }
       }
+
+
+      &.unscrollable {
+          overflow: hidden !important;
+      }
 }
 
 .page__wrapper {
@@ -63,10 +69,11 @@ body {
     padding: 1rem;
 
     .header {
-        height: $headerHeight;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        z-index: 10;
+        background-color: $bgColor;
 
         .title {
             font-size: 3rem;
@@ -195,6 +202,7 @@ body {
     }
 
     .main {
+        padding-top: 4rem;
         position: relative;
        display: grid;
        grid-template-columns: repeat(4, auto);
@@ -230,7 +238,6 @@ body {
                 padding-bottom: 2rem;
             }
         }
-
 
         .coin__section {
             width: 100%;
@@ -413,6 +420,53 @@ display: flex;
             &.active {
                 width: 5rem;
                 white-space: auto;
+            }
+        }
+
+        &.stats {
+            
+            pointer-events: all;
+            display: flex;
+            flex-direction: column;
+
+            .statsButtons {
+                display: flex;
+                justify-content: space-around;
+            }
+            
+
+            table.stats {
+                border-collapse: collapse;
+                background-color: #fffdff;
+                th{
+                    position: relative;
+                    cursor: pointer
+                }
+
+                th:hover {
+                    text-decoration: underline;
+                }
+
+                th::after {
+                    content: '';
+                    width: 1rem;
+                    height: 1rem;
+                    position: absolute;
+                    background-image: url('../icons/sortarrow.svg');
+                    background-repeat: no-repeat;
+                    background-size: contain;
+                    right: 0.5rem;
+                    bottom: 1rem;
+                }
+
+                tr,th, td {
+                    border: 2px solid black;
+                    text-align: center;
+                    font-size: 2rem;
+                    padding: 0.5rem;
+                }
+
+               
             }
         }
 
