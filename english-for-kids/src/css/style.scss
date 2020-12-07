@@ -145,6 +145,11 @@ body {
 
 
     .switch__wrapper {
+
+        &.locked {
+            pointer-events: none;
+            opacity: 0;
+        }
         cursor: pointer;
         padding: 0.5rem;
         display: flex;
@@ -440,30 +445,72 @@ display: flex;
                 background-color: #fffdff;
                 th{
                     position: relative;
-                    cursor: pointer
+                    cursor: pointer;
+
+                    &.train {
+                        background-image: url('../icons/train.svg');
+                        background-size: contain;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                    }
+
+                    &.play {
+                        background-image: url('../icons/play.svg');
+                        background-size: contain;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                    }
+
+                    &.correct {
+                        
+                            background-image: url('../icons/correct.svg');
+                            background-size: contain;
+                            background-repeat: no-repeat;
+                            background-position: center;
+                    
+                    }
+
+                    &.errors {
+                        background-image: url('../icons/wrong.svg');
+                        background-size: contain;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                    }
+                    
+                    &:hover {
+                        text-decoration: underline;
+                        background-color: rgba($color: #000000, $alpha: 0.08)
+                    };
+
+                    &::after {
+                        content: '';
+                        width: 1rem;
+                        height: 1rem;
+                        position: absolute;
+                        background-image: url('../icons/sortarrow.svg');
+                        background-repeat: no-repeat;
+                        background-size: contain;
+                        right: 0.5rem;
+                        bottom: 1rem;
+                    }
+
+                    &[data-sort-order = 'true']::after {
+                        transform: rotate(180deg);
+                    }
                 }
 
-                th:hover {
-                    text-decoration: underline;
-                }
+            
 
-                th::after {
-                    content: '';
-                    width: 1rem;
-                    height: 1rem;
-                    position: absolute;
-                    background-image: url('../icons/sortarrow.svg');
-                    background-repeat: no-repeat;
-                    background-size: contain;
-                    right: 0.5rem;
-                    bottom: 1rem;
-                }
+             
+
+               
 
                 tr,th, td {
                     border: 2px solid black;
                     text-align: center;
                     font-size: 2rem;
                     padding: 0.5rem;
+                    min-width: 5.5rem;
                 }
 
                

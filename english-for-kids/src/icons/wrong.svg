@@ -1,0 +1,24 @@
+<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <radialGradient gradientUnits="userSpaceOnUse" r="27.545" cy="15.163" cx="15.891" id="a">
+   <stop offset="0" stop-color="#fff"/>
+   <stop offset="1" stop-opacity="0" stop-color="#00f038"/>
+  </radialGradient>
+  <radialGradient gradientUnits="userSpaceOnUse" gradientTransform="matrix(.91888 .94532 -.71707 .69701 13.381 -10.047)" r="27.545" cy="16.847" cx="16.028" id="b">
+   <stop offset="0" stop-color="#ff9b9b"/>
+   <stop offset="1" stop-color="#f00000"/>
+  </radialGradient>
+ </defs>
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="66" width="66" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <g id="svg_5">
+   <path id="svg_6" fill="url(#a)" d="m59.503907,31.503903a27.503407,27.503407 0 1 1 -55.007813,0a27.503407,27.503407 0 1 1 55.007813,0z"/>
+   <path id="svg_7" stroke-width="2.5038" stroke-linejoin="round" stroke-linecap="round" stroke="#be0000" fill="url(#b)" d="m59.503907,31.503903a27.503407,27.503407 0 1 1 -55.007813,0a27.503407,27.503407 0 1 1 55.007813,0z"/>
+   <path id="svg_8" fill="#fff" d="m36.094094,18.316071c-1.798,1.5509 -3.1446,4.3692 -4.5312,5.8438c-2.6315,-2.177 -3.8188,-6.2358 -6.6562,-7.375c-3.4406,0.91828 -8.9042,4.1354 -4.875,7.625c2.0576,3.0423 6.1945,5.7464 7.1562,8.9062c-1.4673,3.7894 -4.291,6.615 -7.0312,9.375c1.3399,4.6754 7.7548,0.52478 10.344,-1.75c2.0648,-4.6338 3.5683,0.89824 5.4994,2.891c1.5405,6.2227 9.8042,4.4034 10.522,-0.73944c-2.8396,-4.5489 -6.7818,-8.9244 -9.521,-13.402c1.0851,-4.6542 5.6334,-7.7704 6.6875,-12.281c-1.7893,-3.1223 -5.2813,0.35232 -7.5938,0.90625l-0.0007,0.00019z"/>
+  </g>
+ </g>
+</svg>

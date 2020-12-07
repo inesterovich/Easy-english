@@ -98,8 +98,9 @@ export class EnglishApp {
                     backSide.classList.toggle('active');
                 } else {
                     const cardId = event.target.closest('.card').id;
-                    const currentCard = this.categoryCards.find(card => card.id == cardId);
 
+                    let currentCard = this.categoryCards.find(card => card.id == cardId);
+                   
                     const frontSide = event.target.closest('.front__side');
 
                     if (frontSide) {
@@ -127,6 +128,23 @@ export class EnglishApp {
             this.generateStatsLayout(event.target, field, sortOrder)
          
             
+        }
+
+
+        if (event.target.dataset.action === 'reset') {
+            //А в принципе надо посмотреть, что у меня в statsObj и как оно лежит
+            this.stats = [];
+            this.generateStatsData();
+
+            storage.set('stats', this.stats);
+            this.generateStatsLayout(null, 'name', true);
+        }
+
+
+        if (event.target.dataset.action === 'repeat') {
+            this.setRepeatLayout();
+        } else {
+            this.layout.header.childNodes[2].classList.remove('locked');
         }
 
 
@@ -187,6 +205,7 @@ export class EnglishApp {
             this.layout.main.dataset.isCategory = 'false';
         }
 
+
     }
 
 
@@ -198,18 +217,18 @@ export class EnglishApp {
         }
 
         const buttons = create('div', 'statsButtons', [
-            create('button', 'hard__words_button', `Repeat dificcult words`, null, ['type', 'button']),
-            create('button', 'resetButton', 'Reset', null, ['type', 'button'])
+            create('button', 'hard__words_button', `Repeat dificcult words`, null, ['type', 'button'], ['action', 'repeat']),
+            create('button', 'resetButton', 'Reset', null, ['type', 'button'], ['action', 'reset'])
         ])
         const header = create('tr', 'table__header',
             [
         create('th', 'name', 'name', null,['tableHeader', 'true'], ['field', 'name']),
         create('th', 'translate', 'translate', null, ['tableHeader', 'true'], ['field', 'translate'],),
         create('th', 'category', 'category', null, ['tableHeader', 'true'], ['field', 'category']),
-        create('th', 'train', 'train', null, ['tableHeader', 'true'], ['field', 'train'], ),
-        create('th', 'play', 'play', null, ['tableHeader', 'true'], ['field', 'play'], ),
-        create('th', 'correct', 'correct', null, ['tableHeader', 'true'], ['field', 'correctPercent'], ),
-        create('th', 'errors', 'errors', null, ['tableHeader', 'true'], ['field', 'errors'], ),
+        create('th', 'train', '', null, ['tableHeader', 'true'], ['field', 'train'], ),
+        create('th', 'play', '', null, ['tableHeader', 'true'], ['field', 'play'], ),
+        create('th', 'correct', '', null, ['tableHeader', 'true'], ['field', 'correctPercent'], ),
+        create('th', 'errors', '', null, ['tableHeader', 'true'], ['field', 'errors'], ),
             ])
         
         const thead = create('thead', 'thead', header);
@@ -220,6 +239,7 @@ export class EnglishApp {
         this.dictionary.forEach(word => {
 
             const statsObj = {
+            id: word.id,
              name: word.en,
              translate: word.ru,
              category: word.category,
@@ -233,11 +253,11 @@ export class EnglishApp {
 
         })
        
-
+        let targetIndex = null;
         if (target) {
 
             const childs = header.childNodes;
-            let targetIndex = 0;
+            targetIndex = 0;
 
             while (target.dataset.field != childs[targetIndex].dataset.field) {
                 targetIndex += 1;
@@ -267,9 +287,29 @@ export class EnglishApp {
         } else {
             header.childNodes[0].dataset.sortOrder = true;
         }
-      
+            
         statsArray.sort(this.sortByfieldNane(field, sortOrder))
 
+        const difficulties = statsArray.slice().filter(statsObj => statsObj.errors !== 0);
+       
+
+        if (difficulties.length !== 0) {
+            this.difficultWords = difficulties.slice().sort(this.sortByfieldNane('errors', true));
+            this.difficultWords.reverse();
+            if (this.difficultWords.length > 8) {
+               this.difficultWords = this.difficultWords.slice(0, 8);
+            }
+            this.difficultWords = this.difficultWords.map(statsObj => statsObj.id);
+        } else {
+            this.difficultWords = [];
+        }
+
+        if (targetIndex > 2 ) {
+          statsArray.reverse();
+            
+         }
+
+        console.log(this.difficultWords);
         statsArray.forEach(statsObj => {
             const html = create('tr', 'stats__row',
             [
@@ -301,11 +341,23 @@ export class EnglishApp {
     }
 
     sortByfieldNane(field, sortOrder) {
-        if (sortOrder === true) {
-            return (a, b) => a[field] > b[field] ? 1 : -1;
-        } else {
-            return (a, b) => a[field] < b[field] ? 1 : -1;
+        if (field == 'correctPercent') {
+            if (sortOrder === true) {
+                return (a, b) => Number(a[field]) > Number(b[field]) ? 1 : -1;
+            } else {
+                return (a, b) => Number(a[field]) < Number(b[field]) ? 1 : -1;
+            }
+            
+        } else if (field != 'correctPercent') {
+            if (sortOrder === true) {
+                return (a, b) => a[field] > b[field] ? 1 : -1;
+            } else {
+                return (a, b) => a[field] < b[field] ? 1 : -1;
+            }
+
         }
+
+       
         
     }
 
@@ -374,6 +426,32 @@ export class EnglishApp {
         this.playGame.button = create('button', 'game__button', 'Start Game', this.layout.main);
 
 
+    }
+
+    setRepeatLayout() {
+        let mainContent = this.layout.main.childNodes;
+        while (mainContent.length > 0) {
+            mainContent.forEach(item => item.remove());
+        }
+        this.layout.main.classList.remove('stats');
+
+ 
+        const categoryArray = this.difficultWords.map(id => new Card(this.dictionary[id], this.base).init()
+        
+           
+        );
+
+        this.categoryCards = categoryArray;
+
+        this.categoryCards.forEach(card => {
+            card.html.classList.remove('play');
+            this.layout.main.appendChild(card.html);
+            const backSide = card.html.childNodes[1];
+            backSide.addEventListener('mouseleave', this.mouseLeaveHandler);
+        })
+        this.layout.header.childNodes[2].classList.add('locked');
+        this.layout.main.dataset.isCategory = true;
+        
     }
 
     playGameHandler = (event) => {
@@ -536,27 +614,7 @@ export class EnglishApp {
 
         })
         
-        if (this.stats.length === 0) {
-            for (let i = 0; i < this.dictionary.length; i += 1) {
-        
-                const name = this.dictionary[i].en;
-                this.stats[i] = {
-                    name: name,
-                    train: 0,
-                    play: 0,
-                    errors : 0,
-    
-                    get correctPercent() {
-                        let result = ((this.play - this.errors) / this.play) * 100;
-                        if (isNaN(result)) result = 0;
-                        return result.toFixed(2);
-                    }
-                }
-            }
-        } else if (this.stats.length != 0) {
-            this.stats = storage.get('stats');
-        }
-
+        this.generateStatsData();
 
         this.categories = Array.from(this.categories);
 
@@ -586,6 +644,32 @@ export class EnglishApp {
         this.layout.body.prepend(pageWrapper)
 
         return this;
+    }
+
+    generateStatsData() {
+        if (this.stats.length === 0) {
+            for (let i = 0; i < this.dictionary.length; i += 1) {
+        
+                const name = this.dictionary[i].en;
+                const id = this.dictionary[i].id;
+                this.stats[i] = {
+                    id: id,
+                    name: name,
+                    train: 0,
+                    play: 0,
+                    errors : 0,
+    
+                    get correctPercent() {
+                        let result = ((this.play - this.errors) / this.play) * 100;
+                        if (isNaN(result)) result = 0;
+                        return result.toFixed(2);
+                    }
+                }
+            }
+        } else if (this.stats.length != 0) {
+            this.stats = storage.get('stats');
+        }
+
     }
 
    
