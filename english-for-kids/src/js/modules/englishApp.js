@@ -61,7 +61,7 @@ export class EnglishApp {
         if (event.target.dataset.btn === 'menu') {
             event.target.classList.toggle('active');
             this.layout.modals.classList.toggle('active');
-            this.layout.body.classList.toggle('unscrollable');
+          this.layout.body.classList.toggle('unscrollable');
         } else {
             this.layout.modals.classList.remove('active');
             this.menuBtn.classList.remove('active');
@@ -71,6 +71,13 @@ export class EnglishApp {
         if (event.target.closest('.category__card')) {
             const target = event.target.closest('.category__card');
             const categoryName = target.dataset.category;
+            const menuList = this.layout.modals.childNodes[0].childNodes[0].childNodes;
+            menuList.forEach(node => {
+                node.childNodes[0].classList.remove('active');
+            })
+            const menuListTextArray = Array.from(menuList).map(item => item.innerText);
+            let j = menuListTextArray.findIndex(item => item == categoryName);
+            menuList[j].childNodes[0].classList.add('active');
             this.generateLayout(categoryName);
         }
 

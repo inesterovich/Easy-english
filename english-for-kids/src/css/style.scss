@@ -27,6 +27,10 @@ body {
       height: 100%;
       user-select: none;
 
+      &::-webkit-scrollbar {
+        width: 0;
+      }
+
       .window {
           position: absolute;
           top: 0;
@@ -397,7 +401,6 @@ display: flex;
         }
 
         .game__button {
-           
             
             height: 5rem;
             width: 10rem;
@@ -435,8 +438,36 @@ display: flex;
             flex-direction: column;
 
             .statsButtons {
+                
                 display: flex;
-                justify-content: space-around;
+                justify-content: space-between;
+
+                button {
+           
+            font-size: 2rem;
+            background-color:#44c767;
+	        border-radius:28px;
+	        border:1px solid #18ab29;
+	        display:inline-block;
+	        cursor:pointer;
+	        color:#ffffff;
+	        font-family:Arial;
+	        padding:1rem 2rem;
+	        text-decoration:none;
+            text-shadow:0px 1px 0px #2f6627;
+            outline: none;
+          
+            
+            &:hover {
+                background:linear-gradient(to bottom, #5cbf2a 5%, #44c767 100%);
+                background-color:#5cbf2a;
+            }
+
+            &.active {
+                width: 5rem;
+                white-space: auto;
+            }
+                }
             }
             
 
@@ -614,11 +645,42 @@ display: flex;
 
 @media (max-width: 776px) {
     .page__wrapper {
-
+        padding: 0;
 
         .main {
          
             grid-template-columns: repeat(2, auto);
+            &.stats {
+                width: 100vw;
+                .statsButtons {
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    row-gap: 1rem;
+                }
+
+                table.stats {
+                    tr,th, td {
+                        border: 2px solid black;
+                        text-align: center;
+                        font-size: 1.5rem;
+                        padding: 0.5rem;
+                        min-width: auto;
+                    }
+
+                    th::after {
+                        opacity: 0;
+                    }
+                }
+
+               
+            }
+        }
+
+        .footer {
+            font-size: 1.5rem;
+        
+           
+            
         }
     }
 
@@ -630,13 +692,33 @@ display: flex;
         .header {
             flex-wrap: wrap;
             justify-content: center;
-            column-gap: 2rem;
-            row-gap: 1rem;
+        
         }
+
 
         .main {
             margin-top: 4rem;
             grid-template-columns: repeat(1, auto);
+
+            &.stats {
+                table.stats {
+                    width: 100vw;
+                    tr,th, td {
+                        border: 2px solid black;
+                        text-align: center;
+                        font-size: 1rem;
+                        min-width: auto;
+                    }
+                }
+
+               
+            }
+        }
+
+
+        .modals {
+            overflow: hidden;
+            height: 100vh;
         }
     }
 }
