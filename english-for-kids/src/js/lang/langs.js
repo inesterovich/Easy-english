@@ -1,21 +1,18 @@
 import english from './en';
 import russian from './ru';
 
-english.forEach((enObject, index) => {
-    
-   russian.forEach(ruObject => {
-if (ruObject.id === enObject.id ) {
-    enObject.ru = ruObject.ru
+english.forEach((enObject) => {
+    russian.forEach((ruObject) => {
+        if (ruObject.id === enObject.id) {
+            /* Здесь я обьединяю два массива в один,
+        мне нужно дабавить в объекты первого некоторые свойства второго.
+        По отдельности они мне не нужны - заготовка на случай внезапного добавления ещё 20 языков */
+            // eslint-disable-next-line no-param-reassign
+            enObject.ru = ruObject.ru;
+        }
+    });
+});
 
-}
-
-   })
-
-
-})
-
-/*  Давай-ка пропишем функцию сбора языков, перепишем на map массив и тогда посмотрим, что и куда не лезет. */
-
-
-export {english as dictionary};
-
+/* Не сообразил, как импортировать через дефолтный экспорт с одновременным переименованием . */
+// eslint-disable-next-line import/prefer-default-export
+export { english as dictionary };

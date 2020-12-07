@@ -1,10 +1,11 @@
-import { dictionary } from '../lang/langs'
-import Card from './card'
+import { dictionary } from '../lang/langs';
+import Card from './card';
 import create from '../utils/create';
 import * as randFunc from '../utils/unicRandomGenerator';
-import * as storage from '../utils/storage'
+import * as storage from '../utils/storage';
+import playSound from '../utils/playSound';
 
-export class EnglishApp {
+export default class EnglishApp {
     constructor(base) {
         this.base = base;
         this.dictionary = dictionary;
@@ -15,10 +16,9 @@ export class EnglishApp {
             button: null,
             index: 0,
             counter: 0,
-        }
+        };
 
         this.stats = storage.get('stats') || [];
-
     }
 
     clickHandler = (event) => {
@@ -34,11 +34,9 @@ export class EnglishApp {
                 this.mode = 'Train';
                 const isCategory = this.layout.main.dataset.isCategory === 'true';
                 if (isCategory) {
-
                     const page = this.layout.main.dataset.categoryName;
-                    this.setTrainLayout(page)
+                    this.setTrainLayout(page);
                 }
-
             } else {
                 switchInput.checked = true;
                 trainLabel.classList.toggle('active');
@@ -46,22 +44,18 @@ export class EnglishApp {
                 this.mode = 'Play';
                 const isCategory = this.layout.main.dataset.isCategory === 'true';
                 if (isCategory) {
-
                     const page = this.layout.main.dataset.categoryName;
-                    this.setPlayLayout(page)
+                    this.setPlayLayout(page);
                 }
-
             }
-
-
         } else {
-            event.preventDefault()
-        };
+            event.preventDefault();
+        }
 
         if (event.target.dataset.btn === 'menu') {
             event.target.classList.toggle('active');
             this.layout.modals.classList.toggle('active');
-          this.layout.body.classList.toggle('unscrollable');
+            this.layout.body.classList.toggle('unscrollable');
         } else {
             this.layout.modals.classList.remove('active');
             this.menuBtn.classList.remove('active');
@@ -72,11 +66,11 @@ export class EnglishApp {
             const target = event.target.closest('.category__card');
             const categoryName = target.dataset.category;
             const menuList = this.layout.modals.childNodes[0].childNodes[0].childNodes;
-            menuList.forEach(node => {
+            menuList.forEach((node) => {
                 node.childNodes[0].classList.remove('active');
-            })
-            const menuListTextArray = Array.from(menuList).map(item => item.innerText);
-            let j = menuListTextArray.findIndex(item => item == categoryName);
+            });
+            const menuListTextArray = Array.from(menuList).map((item) => item.innerText);
+            const j = menuListTextArray.findIndex((item) => item === categoryName);
             menuList[j].childNodes[0].classList.add('active');
             this.generateLayout(categoryName);
         }
@@ -84,9 +78,9 @@ export class EnglishApp {
         if (event.target.closest('.menu__item__link')) {
             const linkName = event.target.closest('.menu__item__link').innerText;
             const linkList = event.target.closest('.menu__list').childNodes;
-            linkList.forEach(node => {
+            linkList.forEach((node) => {
                 node.childNodes[0].classList.remove('active');
-            })
+            });
 
             event.target.closest('.menu__item__link').classList.add('active');
             this.generateLayout(linkName);
@@ -94,52 +88,41 @@ export class EnglishApp {
 
         if (this.mode === 'Train') {
             if (event.target.closest('.card')) {
-                const id = event.target.closest('.card').id;
+                const { id } = event.target.closest('.card');
                 const statObj = this.stats[id];
                 statObj.train += 1;
                 storage.set('stats', this.stats);
                 if (event.target.classList.contains('rotate__card')) {
-                    let frontSide = event.target.closest('.front__side');
-                    let backSide = event.target.closest('.card').childNodes[1];
+                    const frontSide = event.target.closest('.front__side');
+                    const backSide = event.target.closest('.card').childNodes[1];
                     frontSide.classList.toggle('active');
                     backSide.classList.toggle('active');
                 } else {
                     const cardId = event.target.closest('.card').id;
+                    const currentCard = this.categoryCards
+                        .find((card) => String(card.id) === cardId);
 
-                    let currentCard = this.categoryCards.find(card => card.id == cardId);
-                   
                     const frontSide = event.target.closest('.front__side');
 
                     if (frontSide) {
-                        this.playSound(currentCard)
+                        playSound(currentCard);
                     }
-
-
                 }
-
-
             }
-
-
         } else if (this.mode === 'Play') {
             event.preventDefault();
             event.stopPropagation();
             this.playGameHandler(event);
         }
 
-
         if (event.target.dataset.tableHeader) {
-            const field = event.target.dataset.field;
-            let sortOrder = event.target.dataset.sortOrder;
-            
-            this.generateStatsLayout(event.target, field, sortOrder)
-         
-            
+            const { field } = event.target.dataset;
+            const { sortOrder } = event.target.dataset;
+
+            this.generateStatsLayout(event.target, field, sortOrder);
         }
 
-
         if (event.target.dataset.action === 'reset') {
-            //А в принципе надо посмотреть, что у меня в statsObj и как оно лежит
             this.stats = [];
             this.generateStatsData();
 
@@ -147,16 +130,11 @@ export class EnglishApp {
             this.generateStatsLayout(null, 'name', true);
         }
 
-
         if (event.target.dataset.action === 'repeat') {
             this.setRepeatLayout();
         } else {
             this.layout.header.childNodes[2].classList.remove('locked');
         }
-
-
-
-
     }
 
     mouseLeaveHandler = (event) => {
@@ -169,13 +147,10 @@ export class EnglishApp {
     }
 
     generateLayout(page) {
-
-
         if (page === 'main' || page === 'Main') {
-
-            let mainContent = this.layout.main.childNodes;
+            const mainContent = this.layout.main.childNodes;
             while (mainContent.length > 0) {
-                mainContent.forEach(item => item.remove());
+                mainContent.forEach((item) => item.remove());
             }
 
             this.categoriesHtml = [];
@@ -184,94 +159,103 @@ export class EnglishApp {
 
                 const categoryCard = create('div', 'category__card',
                     [create('img', 'category__img', null, null, ['src', src]),
-                    create('h3', 'category__name', `${categoryName}`, null)]
-                    , null, ['category', `${categoryName}`]);
+                        create('h3', 'category__name', `${categoryName}`, null)],
+                    null, ['category', `${categoryName}`]);
                 this.layout.main.appendChild(categoryCard);
-                this.categoriesHtml.push(categoryCard)
-            })
+                this.categoriesHtml.push(categoryCard);
+            });
 
             this.layout.main.classList.remove('stats');
-
-
         }
 
         if (page === 'stats' || page === 'Stats') {
             this.generateStatsLayout(null, 'name', true);
             delete this.layout.main.dataset.categoryName;
-            
-            
         }
 
-
         if (this.categories.includes(page)) {
-            this.mode === 'Train' ? this.setTrainLayout(page) : this.setPlayLayout(page);
+            if (this.mode === 'Train') {
+                this.setTrainLayout(page);
+            } else if (this.mode === 'Play') {
+                this.setPlayLayout(page);
+            }
+
             this.layout.main.dataset.isCategory = 'true';
             this.layout.main.dataset.categoryName = page;
             this.layout.main.classList.remove('stats');
         } else {
             this.layout.main.dataset.isCategory = 'false';
         }
-
-
     }
 
-
     generateStatsLayout(target, field, sortOrder) {
-       
-        let mainContent = this.layout.main.childNodes;
+        // Это коллбек сортировки. Тут логично возвращать функцию
+        // eslint-disable-next-line consistent-return
+        function sortByfieldNane(fieldName, sortingOrder) {
+            if (fieldName === 'correctPercent') {
+                if (sortingOrder === true) {
+                    return (a, b) => (Number(a[fieldName]) > Number(b[fieldName]) ? 1 : -1);
+                }
+                return (a, b) => (Number(a[fieldName]) < Number(b[fieldName]) ? 1 : -1);
+            } if (fieldName !== 'correctPercent') {
+                if (sortingOrder === true) {
+                    return (a, b) => (a[fieldName] > b[fieldName] ? 1 : -1);
+                }
+                return (a, b) => (a[fieldName] < b[fieldName] ? 1 : -1);
+            }
+        }
+
+        const mainContent = this.layout.main.childNodes;
         while (mainContent.length > 0) {
-            mainContent.forEach(item => item.remove());
+            mainContent.forEach((item) => item.remove());
         }
 
         const buttons = create('div', 'statsButtons', [
-            create('button', 'hard__words_button', `Repeat dificcult words`, null, ['type', 'button'], ['action', 'repeat']),
-            create('button', 'resetButton', 'Reset', null, ['type', 'button'], ['action', 'reset'])
-        ])
+            create('button', 'hard__words_button', 'Repeat dificcult words', null, ['type', 'button'], ['action', 'repeat']),
+            create('button', 'resetButton', 'Reset', null, ['type', 'button'], ['action', 'reset']),
+        ]);
         const header = create('tr', 'table__header',
             [
-        create('th', 'name', 'name', null,['tableHeader', 'true'], ['field', 'name']),
-        create('th', 'translate', 'translate', null, ['tableHeader', 'true'], ['field', 'translate'],),
-        create('th', 'category', 'category', null, ['tableHeader', 'true'], ['field', 'category']),
-        create('th', 'train', '', null, ['tableHeader', 'true'], ['field', 'train'], ),
-        create('th', 'play', '', null, ['tableHeader', 'true'], ['field', 'play'], ),
-        create('th', 'correct', '', null, ['tableHeader', 'true'], ['field', 'correctPercent'], ),
-        create('th', 'errors', '', null, ['tableHeader', 'true'], ['field', 'errors'], ),
-            ])
-        
+                create('th', 'name', 'name', null, ['tableHeader', 'true'], ['field', 'name']),
+                create('th', 'translate', 'translate', null, ['tableHeader', 'true'], ['field', 'translate']),
+                create('th', 'category', 'category', null, ['tableHeader', 'true'], ['field', 'category']),
+                create('th', 'train', '', null, ['tableHeader', 'true'], ['field', 'train']),
+                create('th', 'play', '', null, ['tableHeader', 'true'], ['field', 'play']),
+                create('th', 'correct', '', null, ['tableHeader', 'true'], ['field', 'correctPercent']),
+                create('th', 'errors', '', null, ['tableHeader', 'true'], ['field', 'errors']),
+            ]);
+
         const thead = create('thead', 'thead', header);
         const tbody = create('tbody', 'tbody', null);
-        
+
         const statsArray = [];
-            
-        this.dictionary.forEach(word => {
 
+        this.dictionary.forEach((word) => {
             const statsObj = {
-            id: word.id,
-             name: word.en,
-             translate: word.ru,
-             category: word.category,
-             train: this.stats[word.id].train,
-             play: this.stats[word.id].play,
-             errors: this.stats[word.id].errors,
-             correctPercent: this.stats[word.id].correctPercent,
-            }
+                id: word.id,
+                name: word.en,
+                translate: word.ru,
+                category: word.category,
+                train: this.stats[word.id].train,
+                play: this.stats[word.id].play,
+                errors: this.stats[word.id].errors,
+                correctPercent: this.stats[word.id].correctPercent,
+            };
 
-            statsArray.push(statsObj)
+            statsArray.push(statsObj);
+        });
 
-        })
-       
         let targetIndex = null;
+        let innerSortOrder = sortOrder;
         if (target) {
-
             const childs = header.childNodes;
             targetIndex = 0;
 
-            while (target.dataset.field != childs[targetIndex].dataset.field) {
+            while (target.dataset.field !== childs[targetIndex].dataset.field) {
                 targetIndex += 1;
             }
 
             if (!target.dataset.sortOrder) {
-            
                 for (let i = 0; i < childs.length; i += 1) {
                     if (i === targetIndex) {
                         childs[i].dataset.sortOrder = true;
@@ -279,186 +263,129 @@ export class EnglishApp {
                         delete childs[i].dataset.sortOrder;
                     }
                 }
-               
-                sortOrder = true;
-                const tableHeadHTML = target.closest('thead');
-                console.log(tableHeadHTML);  
-            } else if (target.dataset.sortOrder === 'true') {
-                childs[targetIndex].dataset.sortOrder === 'false';
-                sortOrder = false;
-            } else if (targetIndex.dataset.sortOrder === 'false') {
-                childs[targetIndex].dataset.sortOrder === 'true';
-                sortOrder = true;
-            }
 
+                innerSortOrder = true;
+            } else if (target.dataset.sortOrder === 'true') {
+                innerSortOrder = false;
+            } else if (targetIndex.dataset.sortOrder === 'false') {
+                innerSortOrder = true;
+            }
         } else {
             header.childNodes[0].dataset.sortOrder = true;
         }
-            
-        statsArray.sort(this.sortByfieldNane(field, sortOrder))
 
-        const difficulties = statsArray.slice().filter(statsObj => statsObj.errors !== 0);
-       
+        statsArray.sort(sortByfieldNane(field, innerSortOrder));
+
+        const difficulties = statsArray.slice().filter((statsObj) => statsObj.errors !== 0);
 
         if (difficulties.length !== 0) {
-            this.difficultWords = difficulties.slice().sort(this.sortByfieldNane('errors', true));
+            this.difficultWords = difficulties.slice().sort(sortByfieldNane('errors', true));
             this.difficultWords.reverse();
             if (this.difficultWords.length > 8) {
-               this.difficultWords = this.difficultWords.slice(0, 8);
+                this.difficultWords = this.difficultWords.slice(0, 8);
             }
-            this.difficultWords = this.difficultWords.map(statsObj => statsObj.id);
+            this.difficultWords = this.difficultWords.map((statsObj) => statsObj.id);
         } else {
             this.difficultWords = [];
         }
 
-        if (targetIndex > 2 ) {
-          statsArray.reverse();
-            
-         }
+        if (targetIndex > 2) {
+            statsArray.reverse();
+        }
 
-        console.log(this.difficultWords);
-        statsArray.forEach(statsObj => {
+        statsArray.forEach((statsObj) => {
             const html = create('tr', 'stats__row',
-            [
-                create('td', 'td__name', `${statsObj.name}`),
-                create('td', 'td__translate', `${statsObj.translate}`),
-                create('td', 'td__category', `${statsObj.category}`),
-                create('td', 'td__train', `${statsObj.train}`),
-                create('td', 'td__play', `${statsObj.play}`),
-                create('td', 'td__corrects', `${statsObj.correctPercent}`),
-                create('td', 'td__corrects', `${statsObj.errors}`),
-            
-            ])
-        
-        tbody.appendChild(html);
-            
-            
-          
-        })
+                [
+                    create('td', 'td__name', `${statsObj.name}`),
+                    create('td', 'td__translate', `${statsObj.translate}`),
+                    create('td', 'td__category', `${statsObj.category}`),
+                    create('td', 'td__train', `${statsObj.train}`),
+                    create('td', 'td__play', `${statsObj.play}`),
+                    create('td', 'td__corrects', `${statsObj.correctPercent}`),
+                    create('td', 'td__corrects', `${statsObj.errors}`),
 
+                ]);
 
-    const table = create('table', 'stats',
-        [thead,
-        tbody,
-        ], null)
-    
+            tbody.appendChild(html);
+        });
+
+        const table = create('table', 'stats',
+            [thead,
+                tbody,
+            ], null);
+
         this.layout.main.appendChild(buttons);
         this.layout.main.appendChild(table);
         this.layout.main.classList.add('stats');
     }
 
-    sortByfieldNane(field, sortOrder) {
-        if (field == 'correctPercent') {
-            if (sortOrder === true) {
-                return (a, b) => Number(a[field]) > Number(b[field]) ? 1 : -1;
-            } else {
-                return (a, b) => Number(a[field]) < Number(b[field]) ? 1 : -1;
-            }
-            
-        } else if (field != 'correctPercent') {
-            if (sortOrder === true) {
-                return (a, b) => a[field] > b[field] ? 1 : -1;
-            } else {
-                return (a, b) => a[field] < b[field] ? 1 : -1;
-            }
-
-        }
-
-       
-        
-    }
-
-    playSound(currentCard) {
-        const audio = currentCard.audio;
-
-        if (audio) {
-            audio.currentTime = 0;
-            audio.play();
-        } else {
-            console.log('sound not found');
-        }
-    }
-
-
     setTrainLayout(page) {
-        let mainContent = this.layout.main.childNodes;
+        const mainContent = this.layout.main.childNodes;
         while (mainContent.length > 0) {
-            mainContent.forEach(item => item.remove());
+            mainContent.forEach((item) => item.remove());
         }
 
-        const categoryArray = this.dictionary.filter(wordObj => wordObj.category === page)
-            .map(item => new Card(item, this.base).init())
+        const categoryArray = this.dictionary.filter((wordObj) => wordObj.category === page)
+            .map((item) => new Card(item, this.base).init());
 
         const randArray = Array.from(randFunc.generateSet(0, categoryArray.length))
-            .map(item => categoryArray[item]);
+            .map((item) => categoryArray[item]);
 
         this.categoryCards = randArray;
 
-
-
-
-        this.categoryCards.forEach(card => {
+        this.categoryCards.forEach((card) => {
             card.html.classList.remove('play');
             this.layout.main.appendChild(card.html);
             const backSide = card.html.childNodes[1];
             backSide.addEventListener('mouseleave', this.mouseLeaveHandler);
-        })
-
+        });
     }
 
     setPlayLayout(page) {
-
-        let mainContent = this.layout.main.childNodes;
+        const mainContent = this.layout.main.childNodes;
         while (mainContent.length > 0) {
-            mainContent.forEach(item => item.remove());
+            mainContent.forEach((item) => item.remove());
         }
 
-        const categoryArray = this.dictionary.filter(wordObj => wordObj.category === page)
-            .map(item => new Card(item, this.base).init())
+        const categoryArray = this.dictionary.filter((wordObj) => wordObj.category === page)
+            .map((item) => new Card(item, this.base).init());
 
         const randArray = Array.from(randFunc.generateSet(0, categoryArray.length))
-            .map(item => categoryArray[item]);
+            .map((item) => categoryArray[item]);
 
         this.categoryCards = randArray;
 
-
-        this.categoryCards.forEach(card => {
-            card.html.classList.add('play')
+        this.categoryCards.forEach((card) => {
+            card.html.classList.add('play');
             this.layout.main.appendChild(card.html);
-        })
+        });
 
         this.playGame.coins = create('div', 'coin__section');
         this.layout.main.prepend(this.playGame.coins);
 
         this.playGame.button = create('button', 'game__button', 'Start Game', this.layout.main);
-
-
     }
 
     setRepeatLayout() {
-        let mainContent = this.layout.main.childNodes;
+        const mainContent = this.layout.main.childNodes;
         while (mainContent.length > 0) {
-            mainContent.forEach(item => item.remove());
+            mainContent.forEach((item) => item.remove());
         }
         this.layout.main.classList.remove('stats');
 
- 
-        const categoryArray = this.difficultWords.map(id => new Card(this.dictionary[id], this.base).init()
-        
-           
-        );
+        const categoryArray = this.difficultWords
+            .map((id) => new Card(this.dictionary[id], this.base).init());
 
         this.categoryCards = categoryArray;
 
-        this.categoryCards.forEach(card => {
+        this.categoryCards.forEach((card) => {
             card.html.classList.remove('play');
             this.layout.main.appendChild(card.html);
             const backSide = card.html.childNodes[1];
             backSide.addEventListener('mouseleave', this.mouseLeaveHandler);
-        })
+        });
         this.layout.header.childNodes[2].classList.add('locked');
         this.layout.main.dataset.isCategory = true;
-        
     }
 
     playGameHandler = (event) => {
@@ -466,14 +393,15 @@ export class EnglishApp {
             if (this.playGame.status === null) {
                 this.playGame.status = 'game';
                 this.playGame.button.innerText = 'Repeat';
-                this.playGame.randNumbers = Array.from(randFunc.generateSet(0, this.categoryCards.length));
-                this.playGame.counter = this.categoryCards.length
+                this.playGame.randNumbers = Array.from(
+                    randFunc.generateSet(0, this.categoryCards.length),
+                );
+                this.playGame.counter = this.categoryCards.length;
             }
             const i = this.playGame.randNumbers[this.playGame.index];
 
             this.playGame.currentCard = this.categoryCards[i];
-            this.playSound(this.playGame.currentCard);
-
+            playSound(this.playGame.currentCard);
         }
 
         if (event.target.closest('.card') && this.playGame.status) {
@@ -485,32 +413,28 @@ export class EnglishApp {
                     this.stats[cardId].play += 1;
                     storage.set(this.stats);
                     this.playGame.index += 1;
-                    const audioUrl = `./audio/correctcard.mp3`;
+                    const audioUrl = './audio/correctcard.mp3';
                     const audio = new Audio(audioUrl);
-                    this.playGame.currentCard.html.classList.add('disabled')
+                    this.playGame.currentCard.html.classList.add('disabled');
                     const i = this.playGame.randNumbers[this.playGame.index];
                     this.playGame.currentCard = this.categoryCards[i];
                     // Promise.race пойдёт мне ?
                     audio.play();
                     audio.addEventListener('ended',
-                        () => this.playSound(this.playGame.currentCard));
-                    const coinSrc = './icons/dollartrue.svg'
-                    const fullCoin = create('img', 'coin', null, this.playGame.coins, ['src', `${coinSrc}`])
-
-
+                        () => playSound(this.playGame.currentCard));
+                    const coinSrc = './icons/dollartrue.svg';
+                    create('img', 'coin', null, this.playGame.coins, ['src', `${coinSrc}`]);
                 } else {
-
-                    this.playGame.currentCard.html.classList.add('disabled')
+                    this.playGame.currentCard.html.classList.add('disabled');
                     const result = this.categoryCards.length === this.playGame.counter ? 'Success' : 'Failure';
                     this.playGame.button.remove();
                     if (result === 'Success') {
-                        const src = './icons/succesgame.png'
+                        const src = './icons/succesgame.png';
                         const window = create('div', 'window', create('div', 'result',
                             [
                                 create('img', 'result__img', null, null, ['src', `${src}`]),
-                                create('p', 'result__text', 'You won the game!')
-                            ]
-                        ));
+                                create('p', 'result__text', 'You won the game!'),
+                            ]));
                         this.layout.body.appendChild(window);
                         const audioSrc = './audio/sucessgame.mp3';
                         const audio = new Audio(audioSrc);
@@ -522,22 +446,17 @@ export class EnglishApp {
                             this.playGame.status = null;
                             this.playGame.counter = null;
                             this.generateLayout('main');
-                        })
-
-
-
-
+                        });
                     } else if (result === 'Failure') {
                         const mistakes = this.categoryCards.length - this.playGame.counter;
                         const src = './icons/failedgame.png';
-                        const ending = mistakes > 1 ? 'es' : 'e'
+                        const ending = mistakes > 1 ? 'es' : 'e';
                         const window = create('div', 'window', create('div', 'result',
                             [
                                 create('img', 'result__img', null, null, ['src', `${src}`]),
                                 create('p', 'result__text', `Sorry, you lost.
-                                 You made ${mistakes} mistak${ending}.`)
-                            ]
-                        ));
+                                 You made ${mistakes} mistak${ending}.`),
+                            ]));
                         this.layout.body.appendChild(window);
 
                         const audioSrc = './audio/failedgame.mp3';
@@ -550,32 +469,25 @@ export class EnglishApp {
                             this.playGame.status = null;
                             this.playGame.counter = null;
                             this.generateLayout('main');
-                        })
-
+                        });
                     }
                 }
-
-
             } else if (cardId !== correctCardId) {
                 this.playGame.counter -= 1;
                 this.stats[correctCardId].play += 1;
                 this.stats[correctCardId].errors += 1;
                 storage.set('stats', this.stats);
-                const audioUrl = `./audio/wrongcard.mp3`;
+                const audioUrl = './audio/wrongcard.mp3';
                 const audio = new Audio(audioUrl);
                 audio.play();
-                const coinSrc = './icons/dollarfalse.svg'
-                const blankCoin = create('img', 'coin', null, this.playGame.coins, ['src', `${coinSrc}`])
+                const coinSrc = './icons/dollarfalse.svg';
+                create('img', 'coin', null, this.playGame.coins, ['src', `${coinSrc}`]);
             }
-
         }
-
     }
 
     generateSkin() {
-
-        this.layout =
-        {
+        this.layout = {
             body: null,
             header: null,
             main: null,
@@ -585,70 +497,62 @@ export class EnglishApp {
 
         this.layout.body = document.querySelector('body');
         this.menuBtn = create('div', 'menu__button',
-            [create('span', '', ''), create('span', '', ''), create('span', '', '')], null, ['btn', 'menu'])
+            [create('span', '', ''), create('span', '', ''), create('span', '', '')], null, ['btn', 'menu']);
 
-        let modeButton = create('div', 'switch__wrapper', [
+        const modeButton = create('div', 'switch__wrapper', [
             create('label', 'switcher__label switcher__train active', 'Train', null, ['for', 'checkbox']),
             create('div', 'switcher',
                 [
                     create('input', 'switcher__checkbox', null, null, ['type', 'checkbox'], ['id', 'checkbox']),
-                    create('span', 'switch__button',)
+                    create('span', 'switch__button'),
                 ]),
             create('label', 'switcher__label switcher__play', 'Play', null, ['for', 'checkbox']),
         ], null);
-
 
         this.layout.header = create('header', 'header',
             [this.menuBtn, create('h1', 'title', 'Easy English'), modeButton], null);
         this.layout.main = create('main', 'main', null, null);
         const footerContent = [
             create('div', 'copyright__wrapper', [create('p', 'copyright', '&copy 2020, Ilya Nesterovich'),
-            create('a', 'github__link', 'Visit GitHub', null,
-                ['href', 'https://github.com/inesterovich/']),]),
+                create('a', 'github__link', 'Visit GitHub', null,
+                    ['href', 'https://github.com/inesterovich/'])]),
             create('div', 'rsschool__link__wrapper',
-                create('a', 'rsschool__link', create('img', 'rsschool__logo', null, null, ['src', './icons/rs_school_js.svg']), null, ['href', 'https://rs.school/js/']))]
+                create('a', 'rsschool__link', create('img', 'rsschool__logo', null, null, ['src', './icons/rs_school_js.svg']), null, ['href', 'https://rs.school/js/']))];
         this.layout.footer = create('footer', 'footer', footerContent, null);
 
         this.categories = new Set();
         this.categoriesSrc = [];
 
-        dictionary.forEach(wordObj => {
+        dictionary.forEach((wordObj) => {
             if (!this.categories.has(wordObj.category)) {
                 this.categories.add(wordObj.category);
                 this.categoriesSrc.push(wordObj.src);
             }
+        });
 
-
-        })
-        
         this.generateStatsData();
 
         this.categories = Array.from(this.categories);
 
         const menuLinks = ['Main', ...this.categories, 'Stats'];
         const menuLinksHtml = [];
-        menuLinks.forEach(linkName => {
+        menuLinks.forEach((linkName) => {
             const linkItem = create('li', 'menu__item', create('a', 'menu__item__link', linkName, null, ['href', './']), null);
             menuLinksHtml.push(linkItem);
-        })
+        });
 
-        menuLinksHtml[0].childNodes[0].classList.add('active')
-
-
-
+        menuLinksHtml[0].childNodes[0].classList.add('active');
 
         this.layout.modals = create('section', 'modals',
             create('nav', 'main__nav', create('ul', 'menu__list',
-                menuLinksHtml, null), null)
-            , null);
+                menuLinksHtml, null), null),
+            null);
 
-        let pageWrapper = create('div', 'page__wrapper',
+        const pageWrapper = create('div', 'page__wrapper',
             [this.layout.header, this.layout.main, this.layout.footer, this.layout.modals],
             null);
 
-
-
-        this.layout.body.prepend(pageWrapper)
+        this.layout.body.prepend(pageWrapper);
 
         return this;
     }
@@ -656,40 +560,32 @@ export class EnglishApp {
     generateStatsData() {
         if (this.stats.length === 0) {
             for (let i = 0; i < this.dictionary.length; i += 1) {
-        
                 const name = this.dictionary[i].en;
-                const id = this.dictionary[i].id;
+                const { id } = this.dictionary[i];
                 this.stats[i] = {
-                    id: id,
-                    name: name,
+                    id,
+                    name,
                     train: 0,
                     play: 0,
-                    errors : 0,
-    
+                    errors: 0,
+
                     get correctPercent() {
                         let result = ((this.play - this.errors) / this.play) * 100;
-                        if (isNaN(result)) result = 0;
+                        if (Number.isNaN(result)) result = 0;
                         return result.toFixed(2);
-                    }
-                }
+                    },
+                };
             }
-        } else if (this.stats.length != 0) {
+        } else if (this.stats.length !== 0) {
             this.stats = storage.get('stats');
         }
-
     }
-
-   
 
     init() {
         this.generateSkin();
-        this.generateLayout('main')
+        this.generateLayout('main');
         document.addEventListener('click', this.clickHandler);
 
         return this;
-
     }
-
-
-
 }
