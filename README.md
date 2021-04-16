@@ -5,7 +5,7 @@
 ![image](https://user-images.githubusercontent.com/56800778/101351387-9247c800-38a1-11eb-8089-c38d487709cd.png)
 3.  Deploy: https://rolling-scopes-school.github.io/inesterovich-JS2020Q3/english-for-kids/dist/
 4.  Done 07.12.2020 /Deadline 07.12.2020
-5. Score:  170/170 + технические требования - выключал конкретное правило eslint в следующих случаях: когда я об одном, eslint о другом или когда не сообразил, как это можно сделать иначе. В исходниках в коде к каждому отключенному месту есть комментарии, почему.
+5. Score:  170/170 + технические требования
                                                        
 ### Basic scope +50  
 
