@@ -3,7 +3,7 @@
 1. https://github.com/rolling-scopes-school/tasks/blob/master/tasks/rslang/english-for-kids.md
 2.  
 ![image](https://user-images.githubusercontent.com/56800778/101351387-9247c800-38a1-11eb-8089-c38d487709cd.png)
-3.  Deploy: https://rolling-scopes-school.github.io/inesterovich-JS2020Q3/english-for-kids/dist/
+3.  Deploy: https://easy-english.pet-projects.ru/
 4.  Done 07.12.2020 /Deadline 07.12.2020
 5. Score:  170/170 + технические требования
                                                        
