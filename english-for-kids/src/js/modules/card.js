@@ -24,6 +24,4 @@ export default class Card {
         this.html = create('section', 'card', [frontSide, backSide], null, ['id', this.id]);
         return this;
     }
-
-    /* Id-шник здесь тоже желателен - именно по нему буду считать клики */
 }

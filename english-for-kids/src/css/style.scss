@@ -257,7 +257,7 @@ body {
             display: flex;
             flex-direction: row-reverse;
             column-gap: 0.5rem;
-            flex-wrap: wrap;
+            overflow: hidden;
 
             .coin {
                 height: 3rem;

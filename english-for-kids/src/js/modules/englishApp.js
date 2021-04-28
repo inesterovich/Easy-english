@@ -189,7 +189,6 @@ export default class EnglishApp {
     }
 
     generateStatsLayout(target, field, sortOrder) {
-        // Это коллбек сортировки. Тут логично возвращать функцию
         // eslint-disable-next-line consistent-return
         function sortByfieldNane(fieldName, sortingOrder) {
             if (fieldName === 'correctPercent') {
@@ -418,7 +417,6 @@ export default class EnglishApp {
                     this.playGame.currentCard.html.classList.add('disabled');
                     const i = this.playGame.randNumbers[this.playGame.index];
                     this.playGame.currentCard = this.categoryCards[i];
-                    // Promise.race пойдёт мне ?
                     audio.play();
                     audio.addEventListener('ended',
                         () => playSound(this.playGame.currentCard));

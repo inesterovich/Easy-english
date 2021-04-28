@@ -527,7 +527,6 @@ export default [
             return `./audio/${this.en}.mp3`;
         },
     },
-    //
     {
         id: 48,
         en: 'candy',
@@ -616,7 +615,6 @@ export default [
             return `./audio/${this.en}.mp3`;
         },
     },
-    //
     {
         id: 56,
         en: 'beverage',
